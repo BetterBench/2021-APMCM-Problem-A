@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="20.11.2.0">
+<procedure name="main">
+<interface/>
+<body>
+<c>*读取图片</c>
+<l>read_image (Image, '1-1.jpg')</l>
+<c>* </c>
+<c>* 关闭窗口</c>
+<l>dev_close_window ()</l>
+<l>get_image_size (Image, Width, Height)</l>
+<l>dev_open_window (0, 0, Width, Height, 'black', WindowHandle)</l>
+<c>* </c>
+<c>* Segment a region containing the edges</c>
+<c>*基于全局阈值的图像快速阈值化</c>
+<l>fast_threshold (Image, Region, 0, 120, 7)</l>
+<c>*获取一个边界区域</c>
+<l>boundary (Region, RegionBorder, 'inner')</l>
+<c></c>
+<c>*用圆形结构元素扩张一个区域。</c>
+<l>dilation_circle (RegionBorder, RegionDilation, 3.5)</l>
+<c></c>
+<c>*获得特定区域Region位置的图像</c>
+<l>reduce_domain (Image, RegionDilation, ImageReduced)</l>
+<c>* </c>
+<c>* In the subdomain of the image containing the edges,</c>
+<c>* extract subpixel precise edges.</c>
+<c>*提取亚像素精密边缘轮廓</c>
+<l>edges_sub_pix (ImageReduced, Edges, 'canny', 2, 20, 60)</l>
+<c></c>
+<c>*将一个XLD轮廓分割为直线段、圆（圆弧)、椭圆弧</c>
+<l>segment_contours_xld (Edges, ContoursSplit, 'lines_circles', 5, 4, 3)</l>
+<l>* dev_display (Edges)</l>
+<c></c>
+<c>*计算个数</c>
+<l>count_obj (ContoursSplit, Number)</l>
+<l>dev_display (Image)</l>
+<c></c>
+<c>*定义region填充模式</c>
+<l>dev_set_draw ('margin')</l>
+<l>dev_set_color ('white')</l>
+<l>dev_update_window ('off')</l>
+<l>for I := 1 to Number by 1</l>
+<c>    *选择一个元素</c>
+<l>    select_obj (ContoursSplit, ObjectSelected, I)</l>
+<c>    </c>
+<c>    *返回XLD轮廓的全局属性值</c>
+<l>    get_contour_global_attrib_xld (ObjectSelected, 'cont_approx', Attrib)</l>
+<c>    * Fit a circle to the line segment that are arcs of a circle</c>
+<l>    if (Attrib &gt; 0)</l>
+<c>         </c>
+<c>        *用圆近似XLD轮廓</c>
+<l>        fit_circle_contour_xld (ObjectSelected, 'ahuber', -1, 2, 0, 3, 2, Row, Column, Radius, StartPhi, EndPhi, PointOrder)</l>
+<c>         </c>
+<c>        *创建对应于圆或圆弧的XLD轮廓</c>
+<l>        gen_circle_contour_xld (ContCircle, Row, Column, Radius, 0, rad(360), 'positive', 1.0)</l>
+<l>    endif</l>
+<l>endfor</l>
+<l>dev_set_colored (12)</l>
+<l>dev_set_line_width (3)</l>
+<l>dev_display (ContoursSplit)</l>
+<c></c>
+<l>* read_image (Image2, 'Pic1_2.bmp')</l>
+<l>* dev_display (Image2)</l>
+<l>* dump_window_image (Image1, WindowHandle)</l>
+<l>*write_image (Image1, 'tiff', 0, 'C:/halcon/1')</l>
+<l>*write_image(Image1 , 'png' , 0 , '/media/mgege007/Compitition/APMCM/Halcon/1/1.png' )</l>
+<c> *【来源：https://python.iitter.com/other/144840.html，转载请注明】</c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

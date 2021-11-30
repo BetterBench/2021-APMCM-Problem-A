@@ -1,0 +1,8 @@
+
+* 
+read_image (Image2, 'Pic2_4.bmp')
+rgb1_to_gray (Image2, GrayImage)
+fast_threshold (GrayImage, Region2, 150, 255, 20)
+connection (Region2, ConnectedRegions2)
+sort_region (ConnectedRegions2, SortedRegions,  'first_point', 'true',  'row')
+

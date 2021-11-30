@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="20.11.2.0">
+<procedure name="main">
+<interface/>
+<body>
+<c>*读取图片</c>
+<l>read_image (Image, '1-2.jpg')</l>
+<c>* </c>
+<c>* 关闭窗口</c>
+<l>dev_close_window ()</l>
+<l>get_image_size (Image, Width, Height)</l>
+<l>dev_open_window (0, 0, Width, Height, 'black', WindowHandle)</l>
+<c>* </c>
+<c>* Segment a region containing the edges</c>
+<c>*基于全局阈值的图像快速阈值化</c>
+<l>fast_threshold (Image, Region, 0, 120, 7)</l>
+<c>*获取一个边界区域</c>
+<l>boundary (Region, RegionBorder, 'inner')</l>
+<c></c>
+<c>*用圆形结构元素扩张一个区域。</c>
+<l>dilation_circle (RegionBorder, RegionDilation, 3.5)</l>
+<c></c>
+<c>*获得特定区域Region位置的图像</c>
+<l>reduce_domain (Image, RegionDilation, ImageReduced)</l>
+<c></c>
+<c>*提取亚像素精密边缘轮廓</c>
+<l>edges_sub_pix (ImageReduced, Edges, 'canny', 2, 20, 60)</l>
+<c></c>
+<l>* dev_display (Edges)</l>
+<c>*计算个数,</c>
+<l>count_obj (Edges, Number)</l>
+<c></c>
+<c>* 数字对应第几个轮廓，图2 检测出来总共有6个，图1只有一个轮廓.</c>
+<c></c>
+<c>* 计算第1个轮廓的坐标</c>
+<l>select_obj(Edges,ObjectSelected1,1)</l>
+<l>dev_display (ObjectSelected1)</l>
+<l>get_contour_xld(ObjectSelected1,Row1,Col1)</l>
+<c>* 存储坐标XY值到txt文件中</c>
+<l>open_file('Img2_XY_contours_1.txt','output',FileHandle)</l>
+<l>fwrite_string (FileHandle,Row1+','+Col1+'\n')</l>
+<c>*计算第2个轮廓的坐标</c>
+<l>select_obj(Edges,ObjectSelected2,2)</l>
+<l>dev_display (ObjectSelected2)</l>
+<l>get_contour_xld(ObjectSelected2,Row2,Col2)</l>
+<l>open_file('Img2_XY_contours_2.txt','output',FileHandle)</l>
+<l>fwrite_string (FileHandle,Row2+','+Col2+'\n')</l>
+<c>*计算第3个轮廓的坐标</c>
+<l>select_obj(Edges,ObjectSelected3,3)</l>
+<l>dev_display (ObjectSelected3)</l>
+<l>get_contour_xld(ObjectSelected3,Row3,Col3)</l>
+<l>open_file('Img2_XY_contours_3.txt','output',FileHandle)</l>
+<l>fwrite_string (FileHandle,Row3+','+Col3+'\n')</l>
+<c>*计算第4个轮廓的坐标</c>
+<l>select_obj(Edges,ObjectSelected4,4)</l>
+<l>dev_display (ObjectSelected4)</l>
+<l>get_contour_xld(ObjectSelected4,Row4,Col4)</l>
+<l>open_file('Img2_XY_contours_4.txt','output',FileHandle)</l>
+<l>fwrite_string (FileHandle,Row4+','+Col4+'\n')</l>
+<c>*计算第5个轮廓的坐标</c>
+<l>select_obj(Edges,ObjectSelected5,5)</l>
+<l>dev_display (ObjectSelected5)</l>
+<l>get_contour_xld(ObjectSelected5,Row5,Col5)</l>
+<l>open_file('Img2_XY_contours_5.txt','output',FileHandle)</l>
+<l>fwrite_string (FileHandle,Row5+','+Col5+'\n')</l>
+<c>*计算第6个轮廓的坐标</c>
+<l>select_obj(Edges,ObjectSelected6,6)</l>
+<l>dev_display (ObjectSelected6)</l>
+<l>get_contour_xld(ObjectSelected6,Row6,Col6)</l>
+<l>open_file('Img2_XY_contours_6.txt','output',FileHandle)</l>
+<l>fwrite_string (FileHandle,Row6+','+Col6+'\n')</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="20.11.2.0">
+<procedure name="main">
+<interface/>
+<body>
+<l>dev_update_off ()</l>
+<c>*读取图片</c>
+<l>read_image (Image, 'Pic2_1.bmp')</l>
+<c>* </c>
+<c>* 关闭窗口</c>
+<l>dev_close_window ()</l>
+<l>get_image_size (Image, Width, Height)</l>
+<l>dev_open_window (0, 0, Width, Height, 'black', WindowHandle)</l>
+<c>* </c>
+<c>* Segment a region containing the edges</c>
+<c>*基于全局阈值的图像快速阈值化</c>
+<l>fast_threshold (Image, Region, 0, 120, 7)</l>
+<c>*获取一个边界区域</c>
+<l>boundary (Region, RegionBorder, 'inner')</l>
+<c></c>
+<c>*通过区域的最小外接矩形，从矩形的 Top,Bottom,Left,Right四个方向裁剪区域，得到所需要的区域</c>
+<l>clip_region_rel (RegionBorder, RegionClipped, 5, 5, 5, 5)</l>
+<c></c>
+<c>*用圆形结构元素扩张一个区域。</c>
+<l>dilation_circle (RegionClipped, RegionDilation, 2.5)</l>
+<c></c>
+<c>*获得特定区域Region位置的图像</c>
+<l>reduce_domain (Image, RegionDilation, ImageReduced)</l>
+<c>* </c>
+<c>*使用动态阈值分割图像</c>
+<l>connection(Region, ConnectedRegions)</l>
+<c></c>
+<c>** 图像矫正(第一个标定板，是正的，就不用校正)</c>
+<c>* 计算图像偏转角度</c>
+<l>*orientation_region(ConnectedRegions,Phi)</l>
+<l>*area_center (ConnectedRegions, Area, Row, Column)</l>
+<c>* 取图像变换到水平位置的二维矩阵</c>
+<l>*vector_angle_to_rigid(Row,Column,Phi,Row,Column,0,HomMat2D)</l>
+<c>* 将二维矩阵作用到零件图像将其转换至水平位置</c>
+<l>*affine_trans_image(ImageReduced,ImagTrans,HomMat2D,'cons-tant','false')</l>
+<c></c>
+<c></c>
+<c>*提取亚像素精密边缘轮廓</c>
+<l>edges_sub_pix (ImageReduced, Edges, 'canny', 2, 20, 60)</l>
+<l>*dev_display (ImageReduced)</l>
+<c></c>
+<c>*将一个XLD轮廓分割为直线段、圆（圆弧)、椭圆弧</c>
+<l>segment_contours_xld (Edges, ContoursSplit, 'lines_circles', 5, 4, 3)</l>
+<c>* 计算提取的轮廓数量</c>
+<l>count_obj (ContoursSplit, Number)</l>
+<c></c>
+<c></c>
+<c>*************求第一个圆心坐标</c>
+<l>select_obj (ContoursSplit, SingleSegment, 2)</l>
+<l>get_contour_global_attrib_xld (SingleSegment,'cont_approx', Attrib)</l>
+<c>* 获取每段轮廓的属性， 当某段轮廓的属性 Attrib = 1 也就是圆弧段, 0 的近似为椭圆弧，属性为-1 的轮廓近似为线段</c>
+<l>if (Attrib=1)</l>
+<c>    * 通过合适的圆拟合圆弧轮廓段并获得对应圆心的图像坐标(Row,Column)及半径 Radius</c>
+<l>     fit_circle_contour_xld (SingleSegment,'atukey',-1,2,0,5,2,Row,Column,Radius,StartPhi,EndPh,PointOrder)</l>
+<c>    *拟合提取的亚像素边缘的外接矩形并返回外接矩形的相关参数</c>
+<l>     fit_rectangle2_contour_xld(SingleSegment,'regression',-1,0,0,3,2,Row,Column,Phi,Length11,Length21,PointOrder) </l>
+<c>    *生成对应的圆</c>
+<l>      gen_ellipse_contour_xld (ContEllipse, Row,Column, 0, Radius,Radius, 0, rad(360),'positive',1.0)</l>
+<c>    </c>
+<l>endif</l>
+<c></c>
+<c></c>
+<c>*************求第二个圆心坐标</c>
+<l>select_obj (ContoursSplit, SingleSegment2, 13)</l>
+<l>get_contour_global_attrib_xld (SingleSegment2,'cont_approx', Attrib2)</l>
+<c>* 获取每段轮廓的属性， 当某段轮廓的属性 Attrib = 1 也就是圆弧段, 0 的近似为椭圆弧，属性为-1 的轮廓近似为线段</c>
+<l>if (Attrib2=1)</l>
+<c>    * 通过合适的圆拟合圆弧轮廓段并获得对应圆心的图像坐标(Row,Column)及半径 Radius</c>
+<l>     fit_circle_contour_xld (SingleSegment2,'atukey',-1,2,0,5,2,Row1,Column1,Radius1,StartPhi,EndPh,PointOrder)</l>
+<c>    *拟合提取的亚像素边缘的外接矩形并返回外接矩形的相关参数</c>
+<l>      fit_rectangle2_contour_xld(SingleSegment2,'regression',-1,0,0,3,2,Row1,Column1,Phi,Length12,Length22,PointOrder) </l>
+<c>    *生成对应的圆</c>
+<l>      gen_ellipse_contour_xld (ContEllipse1, Row1,Column1, 0, Radius1,Radius1, 0, rad(360),'positive',1.0)</l>
+<l>endif</l>
+<c> * 最后通过算子 distance_pp 算出圆弧圆心间的距离</c>
+<l> distance_pp(Row,Column,Row1, Column1, Distance)</l>
+<l> PointImageDis[0]:=Distance</l>
+<c></c>
+<l>read_image (Image2, 'Pic2_4.bmp')</l>
+<l>rgb1_to_gray (Image2, GrayImage)</l>
+<l>fast_threshold (GrayImage, Region2, 150, 255, 20)</l>
+<l>connection (Region2, ConnectedRegions2)</l>
+<l>sort_region (ConnectedRegions2, SortedRegions,  'first_point', 'true',  'row')</l>
+<c></c>
+<c></c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

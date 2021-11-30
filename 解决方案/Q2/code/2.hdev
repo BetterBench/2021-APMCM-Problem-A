@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="20.11.2.0">
+<procedure name="main">
+<interface/>
+<body>
+<c></c>
+<c>* </c>
+<l>read_image (Image2, 'Pic2_4.bmp')</l>
+<l>rgb1_to_gray (Image2, GrayImage)</l>
+<l>fast_threshold (GrayImage, Region2, 150, 255, 20)</l>
+<l>connection (Region2, ConnectedRegions2)</l>
+<l>sort_region (ConnectedRegions2, SortedRegions,  'first_point', 'false',  'row')</l>
+<c></c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

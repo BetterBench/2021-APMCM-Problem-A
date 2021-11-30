@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="20.11.2.0">
+<procedure name="main">
+<interface/>
+<body>
+<c>*************** 第1个边框</c>
+<l>NO:=1</l>
+<c>* 读取坐标数据</c>
+<l>open_file ('cnt'+NO+'.txt', 'input', FileHandle) //原始数据.txt中</l>
+<l>fread_string (FileHandle, String1, IsEOF) </l>
+<l>fread_string (FileHandle, String2, IsEOF) </l>
+<l>tuple_split (String1, ',', row) </l>
+<l>tuple_split (String2, ',', col)</l>
+<l>tuple_number (row, NumberX) </l>
+<l>tuple_number (col, NumberY) </l>
+<c></c>
+<c>* 根据坐标产生轮廓</c>
+<l>gen_contour_polygon_xld (Contour, NumberY, NumberX) </l>
+<c></c>
+<c>* 分割轮廓</c>
+<l>segment_contours_xld(Contour, ContoursSplit, 'lines_circles', 10, 8, 2)</l>
+<c></c>
+<c>* 统计分割的轮廓数量</c>
+<l>count_obj (ContoursSplit, Number)</l>
+<c></c>
+<c></c>
+<l>open_file('line_'+NO+'.txt','output',FileHandle_line)</l>
+<c></c>
+<l>open_file('eclipse_'+NO+'.txt','output',FileHandle_eclipse)</l>
+<c></c>
+<l>open_file('circle_'+NO+'.txt','output',FileHandle_cicle)</l>
+<c></c>
+<l>for I := 1 to Number by 1</l>
+<l>    select_obj (ContoursSplit, Contour, I)</l>
+<l>    get_contour_global_attrib_xld (Contour, 'cont_approx', Type)</l>
+<c>    * -1表示线段;0表示椭圆;1表示圆弧</c>
+<l>    if (Type = -1)</l>
+<c>        * 计算起始坐标</c>
+<l>        fit_line_contour_xld (Contour, 'tukey', -1, 0, 5, 2, RowBegin, ColBegin,  RowEnd, ColEnd, Nr, Nc, Dist)</l>
+<l>        fwrite_string (FileHandle_line,  RowEnd+','+ColEnd +','+RowBegin+','+ColBegin+'\n')</l>
+<l>    elseif(Type =0)</l>
+<l>        fit_circle_contour_xld (Contour, 'atukey', -1, 2, 0, 3, 2, Row, Column,  Radius, StartPhi, EndPhi, PointOrder)</l>
+<l>        fwrite_string (FileHandle_eclipse, Row+','+Column +'\n')</l>
+<l>    else</l>
+<l>        fit_circle_contour_xld (Contour, 'atukey', -1, 2, 0, 3, 2, Row, Column,  Radius, StartPhi, EndPhi, PointOrder)</l>
+<l>        fwrite_string (FileHandle_cicle, Row+','+Column +'\n')</l>
+<l>    endif</l>
+<l>endfor</l>
+<c></c>
+<l>close_file(FileHandle_line)</l>
+<l>close_file(FileHandle_eclipse)</l>
+<l>close_file(FileHandle_cicle)</l>
+<c></c>
+<c>************************ 第二个边框</c>
+<l>* NO:=2</l>
+<c></c>
+<l>* open_file ('cnt'+NO+'.txt', 'input', FileHandle) //原始数据.txt中</l>
+<l>* fread_string (FileHandle, String1, IsEOF) </l>
+<l>* fread_string (FileHandle, String2, IsEOF) </l>
+<l>* tuple_split (String1, ',', row) </l>
+<l>* tuple_split (String2, ',', col)</l>
+<l>* tuple_number (row, NumberX) </l>
+<l>* tuple_number (col, NumberY) </l>
+<c></c>
+<l>* gen_contour_polygon_xld (Contour, NumberY, NumberX) </l>
+<c></c>
+<c></c>
+<l>* segment_contours_xld(Contour, ContoursSplit, 'lines_circles', 10, 8, 2)</l>
+<c></c>
+<l>* count_obj (ContoursSplit, Number)</l>
+<c></c>
+<c></c>
+<l>* open_file('line_'+NO+'.txt','output',FileHandle_line)</l>
+<c></c>
+<l>* open_file('eclipse_'+NO+'.txt','output',FileHandle_eclipse)</l>
+<c></c>
+<l>* open_file('circle_'+NO+'.txt','output',FileHandle_cicle)</l>
+<c></c>
+<l>* for I := 1 to Number by 1</l>
+<l>*     select_obj (ContoursSplit, Contour, I)</l>
+<l>*     get_contour_global_attrib_xld (Contour, 'cont_approx', Type)</l>
+<c>    * -1表示线段;0表示椭圆;1表示圆弧</c>
+<l>*     if (Type = -1)</l>
+<c>        * 计算起始坐标</c>
+<l>*         fit_line_contour_xld (Contour, 'tukey', -1, 0, 5, 2, RowBegin, ColBegin,  RowEnd, ColEnd, Nr, Nc, Dist)</l>
+<l>*         fwrite_string (FileHandle_line,  RowEnd+','+ColEnd +','+RowBegin+','+ColBegin+'\n')</l>
+<l>*     elseif(Type =0)</l>
+<l>*         fit_circle_contour_xld (Contour, 'atukey', -1, 2, 0, 3, 2, Row, Column,  Radius, StartPhi, EndPhi, PointOrder)</l>
+<l>*         fwrite_string (FileHandle_eclipse, Row+','+Column +'\n')</l>
+<l>*     else</l>
+<l>*         fit_circle_contour_xld (Contour, 'atukey', -1, 2, 0, 3, 2, Row, Column,  Radius, StartPhi, EndPhi, PointOrder)</l>
+<l>*         fwrite_string (FileHandle_cicle, Row+','+Column +'\n')</l>
+<l>*     endif</l>
+<l>* endfor</l>
+<c></c>
+<l>* close_file(FileHandle_line)</l>
+<l>* close_file(FileHandle_eclipse)</l>
+<l>* close_file(FileHandle_cicle)</l>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>
